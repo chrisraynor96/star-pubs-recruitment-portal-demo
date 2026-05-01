@@ -32,3 +32,25 @@ select {
 button {
   cursor: pointer;
 }
+
+/* Demo image hosted in the GitHub Pages public folder.
+   This applies the Rose Villa Tavern image to the first vacancy card while the React prototype still uses placeholders for other pubs. */
+#vacancy-results article:first-child > div:first-child {
+  background-image: linear-gradient(to top, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.02) 58%), url('/star-pubs-recruitment-portal-demo/images/rose-villa-tavern.svg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+#vacancy-results article:first-child > div:first-child > div:not(:last-child) {
+  display: none;
+}
+
+#vacancy-results article:first-child > div:first-child > div:last-child p:first-child {
+  font-size: 0;
+}
+
+#vacancy-results article:first-child > div:first-child > div:last-child p:first-child::after {
+  content: 'Pub photography';
+  font-size: 0.75rem;
+}

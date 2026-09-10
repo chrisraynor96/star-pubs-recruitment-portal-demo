@@ -1,8 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const NAVY = '#1c1c31';
-const BLUE = '#0a87c4';
 const base = import.meta.env.BASE_URL || '/';
 const asset = (path) => `${base}images/${path}`;
 
@@ -116,6 +114,9 @@ const applications = [
   { id: 104, vacancyId: 5, pub: 'The Crown Inn', location: 'Leeds, West Yorkshire', agreement: 'Leased & Tenanted', stage: 'Application rejected', progress: 100, nextAction: 'This application has not progressed, but you can still explore similar opportunities.' }
 ];
 
+const journeySteps = ['Find a pub', 'Chat to us', 'Our resources', 'Business plan', 'Upload documents', 'Application form'];
+const journeyTiles = ['Your pub match', 'Your documents', 'Application form', 'Business plan', 'Additional support', 'Chat'];
+
 function iconPath(name) {
   const paths = {
     search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>,
@@ -151,8 +152,8 @@ function CardContent({ children, className = '' }) {
   return <div className={className}>{children}</div>;
 }
 
-function StarMark({ dark = false }) {
-  return <div className="flex items-center gap-3"><div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${dark ? 'bg-[#1c1c31] text-white' : 'bg-white text-[#1c1c31]'} shadow-sm`}><span className="text-2xl font-black">★</span></div><div className="leading-none"><div className={`text-2xl font-black tracking-[0.16em] ${dark ? 'text-[#1c1c31]' : 'text-white'}`}>STAR</div><div className={`text-xs font-semibold tracking-[0.55em] ${dark ? 'text-[#1c1c31]/70' : 'text-white/80'}`}>PUBS</div></div></div>;
+function StarMark() {
+  return <div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-[#1c1c31] shadow-sm"><span className="text-2xl font-black">★</span></div><div className="leading-none"><div className="text-2xl font-black tracking-[0.16em] text-white">STAR</div><div className="text-xs font-semibold tracking-[0.55em] text-white/80">PUBS</div></div></div>;
 }
 
 function filterVacancies(list, query, selectedAgreements, selectedPropertyFilters) {
@@ -179,26 +180,8 @@ function getReasons(vacancy, profile) {
 function Header({ page, navigate }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const link = (key, label) => <button onClick={() => { navigate(key); setMobileOpen(false); }} className={page === key ? 'text-white' : 'hover:text-white'}>{label}</button>;
-  return <header className="sticky top-0 z-40 border-b border-white/10 bg-[#1c1c31]/95 backdrop-blur-xl"><div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4 lg:px-8"><button onClick={() => navigate('classic')} aria-label="Classic Star Pubs home"><StarMark /></button><nav className="hidden items-center gap-5 text-sm font-semibold text-white/80 md:flex"><button onClick={() => navigate('classic')} className={page === 'classic' ? 'text-white' : 'hover:text-white'}>Classic Site</button><span className="h-4 w-0.5 bg-white/35" />{link('home', 'Portal home')}<button onClick={() => { navigate('home'); setTimeout(() => document.getElementById('vacancies')?.scrollIntoView({ behavior: 'smooth' }), 50); }} className="hover:text-white">Vacancies</button>{link('profile', 'Profile')}{link('saved', 'Saved pubs')}{link('applications', 'Applications')}</nav><div className="hidden gap-3 md:flex"><Button variant="ghost" onClick={() => navigate('signin')}>Sign in</Button><Button onClick={() => navigate('profile')}>Create profile</Button></div><button className="text-white md:hidden" onClick={() => setMobileOpen(!mobileOpen)}><Icon name={mobileOpen ? 'x' : 'menu'} /></button></div><AnimatePresence>{mobileOpen && <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden bg-[#1c1c31] md:hidden"><div className="grid gap-3 px-5 py-4 text-left text-sm font-semibold text-white/80"><button className="text-left" onClick={() => { navigate('classic'); setMobileOpen(false); }}>Classic Site</button>{link('home', 'Portal home')}{link('profile', 'Profile')}{link('saved', 'Saved pubs')}{link('applications', 'Applications')}<Button variant="ghost" onClick={() => navigate('signin')}>Sign in</Button></div></motion.div>}</AnimatePresence></header>;
-}
-
-function ClassicSitePage({ navigate }) {
-  const noticeItems = ['NEW: Candidate portal now online', 'Search pubs by region', 'Save your favourite opportunities', 'Speak to the Star Pubs team'];
-  return <div className="min-h-screen bg-[#c0c0c0] text-[#000080]" style={{ backgroundImage: 'linear-gradient(45deg, #b5b5b5 25%, transparent 25%), linear-gradient(-45deg, #b5b5b5 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #b5b5b5 75%), linear-gradient(-45deg, transparent 75%, #b5b5b5 75%)', backgroundSize: '18px 18px', backgroundPosition: '0 0, 0 9px, 9px -9px, -9px 0px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-    <div className="mx-auto max-w-5xl border-x-4 border-[#808080] bg-[#eeeeee] shadow-2xl">
-      <div className="border-b-4 border-[#808080] bg-[#1c1c31] px-4 py-3 text-white"><div className="flex flex-col justify-between gap-3 md:flex-row md:items-center"><StarMark /><div className="text-center font-mono text-xs uppercase tracking-[0.2em] text-[#0a87c4]">Best viewed in Netscape Navigator</div><Button onClick={() => navigate('home')}>Enter Portal</Button></div></div>
-      <div className="border-y-2 border-white bg-[#ffffcc] px-3 py-2 font-mono text-sm text-[#1c1c31]"><div className="animate-pulse whitespace-nowrap overflow-hidden">*** {noticeItems.join('  |  ')} ***</div></div>
-      <div className="grid gap-4 p-4 md:grid-cols-[190px_1fr]">
-        <aside className="border-2 border-[#808080] bg-[#dcdcdc] p-3 shadow-[inset_2px_2px_0_#fff,inset_-2px_-2px_0_#777]"><p className="mb-3 bg-[#000080] px-2 py-1 text-center font-black uppercase text-white">Menu</p>{['Find Your Pub', 'Getting Started', 'Why Star', 'Pubs Code', 'Events'].map((item) => <button key={item} onClick={() => navigate(item === 'Find Your Pub' ? 'home' : 'classic')} className="mb-2 block w-full border-2 border-[#808080] bg-[#eeeeee] px-2 py-2 text-left text-sm font-bold text-[#000080] shadow-[inset_2px_2px_0_#fff,inset_-2px_-2px_0_#777] hover:bg-[#ffffcc]">{item}</button>)}<div className="mt-4 bg-black p-2 text-center font-mono text-sm text-[#00ff00]">VISITORS<br />000042</div></aside>
-        <main className="grid gap-4">
-          <section className="border-4 border-[#808080] bg-white p-5 shadow-[inset_3px_3px_0_#fff,inset_-3px_-3px_0_#777]"><p className="inline-block bg-red-600 px-2 py-1 text-xs font-black uppercase text-white animate-pulse">NEW!</p><h1 className="mt-3 text-5xl font-black leading-none text-[#1c1c31] md:text-7xl">Welcome to Star Pubs Online</h1><p className="mt-4 max-w-2xl text-lg font-bold leading-8 text-[#000080]">Find pubs to let, learn about agreements and begin your journey with Star Pubs. This classic homepage is deliberately styled like an early 90s website.</p><div className="mt-6 flex flex-wrap gap-3"><button onClick={() => navigate('home')} className="border-4 border-[#808080] bg-[#0a87c4] px-6 py-3 font-black text-white shadow-[inset_3px_3px_0_rgba(255,255,255,.6),inset_-3px_-3px_0_rgba(0,0,0,.35)]">ENTER RECRUITMENT PORTAL</button><button onClick={() => navigate('profile')} className="border-4 border-[#808080] bg-[#ffffcc] px-6 py-3 font-black text-[#000080] shadow-[inset_3px_3px_0_#fff,inset_-3px_-3px_0_#777]">CREATE PROFILE</button></div></section>
-          <section className="grid gap-4 md:grid-cols-3">{['Search vacancies', 'Save pubs', 'Track applications'].map((title, index) => <button key={title} onClick={() => navigate(index === 2 ? 'applications' : 'home')} className="border-4 border-[#808080] bg-[#f8f8f8] p-4 text-center shadow-[inset_3px_3px_0_#fff,inset_-3px_-3px_0_#777]"><div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-[#1c1c31] text-3xl text-white">★</div><h2 className="text-xl font-black uppercase text-[#1c1c31]">{title}</h2><p className="mt-2 text-sm font-bold text-[#000080] underline">Click here</p></button>)}</section>
-          <section className="border-4 border-[#808080] bg-[#eaf6fd] p-4 shadow-[inset_3px_3px_0_#fff,inset_-3px_-3px_0_#777]"><h2 className="text-2xl font-black uppercase text-[#1c1c31]">Featured pub vacancies</h2><div className="mt-4 grid gap-3">{vacancies.slice(0, 3).map((pub) => <button key={pub.id} onClick={() => navigate('pubDetail', pub.id)} className="flex items-center justify-between border-2 border-[#808080] bg-white px-3 py-2 text-left font-bold text-[#000080] hover:bg-[#ffffcc]"><span>{pub.pub} - {pub.location}</span><span className="text-red-600">MORE &gt;</span></button>)}</div></section>
-        </main>
-      </div>
-      <div className="border-t-4 border-[#808080] bg-[#1c1c31] px-4 py-4 text-center font-mono text-xs text-white">© 1994-ish Star Pubs Web Experience | This is a playful demo homepage</div>
-    </div>
-  </div>;
+  const goToVacancies = () => { navigate('home'); setTimeout(() => document.getElementById('vacancies')?.scrollIntoView({ behavior: 'smooth' }), 50); setMobileOpen(false); };
+  return <header className="sticky top-0 z-40 border-b border-white/10 bg-[#1c1c31]/95 backdrop-blur-xl"><div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4 lg:px-8"><button onClick={() => navigate('home')} aria-label="Star Pubs portal home"><StarMark /></button><nav className="hidden items-center gap-6 text-sm font-semibold text-white/80 md:flex">{link('home', 'Portal home')}<button onClick={goToVacancies} className="hover:text-white">Vacancies</button>{link('profile', 'Profile')}{link('saved', 'Saved pubs')}{link('applications', 'Applications')}</nav><div className="hidden gap-3 md:flex"><Button variant="ghost" onClick={() => navigate('signin')}>Sign in</Button><Button onClick={() => navigate('profile')}>Create profile</Button></div><button className="text-white md:hidden" onClick={() => setMobileOpen(!mobileOpen)}><Icon name={mobileOpen ? 'x' : 'menu'} /></button></div><AnimatePresence>{mobileOpen && <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden bg-[#1c1c31] md:hidden"><div className="grid gap-3 px-5 py-4 text-left text-sm font-semibold text-white/80">{link('home', 'Portal home')}<button className="text-left" onClick={goToVacancies}>Vacancies</button>{link('profile', 'Profile')}{link('saved', 'Saved pubs')}{link('applications', 'Applications')}<Button variant="ghost" onClick={() => navigate('signin')}>Sign in</Button></div></motion.div>}</AnimatePresence></header>;
 }
 
 function ImagePlaceholder({ pub, large = false, muted = false }) {
@@ -241,7 +224,7 @@ function PageHero({ eyebrow, title, copy, navigate, side, background }) {
   return <div className="relative overflow-hidden bg-[#1c1c31] px-5 py-12 text-white lg:px-8 lg:py-16">{background && <><img src={background} alt="Star Pubs header" className="absolute inset-0 h-full w-full object-cover" /><div className="absolute inset-0 bg-[#1c1c31]/78" /></>}<div className="relative mx-auto max-w-7xl"><button onClick={() => navigate('home')} className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-white/75 hover:text-white"><Icon name="back" size={18} /> Back to vacancies</button><div className="grid gap-8 lg:grid-cols-[1fr_420px] lg:items-end"><div><p className="text-sm font-black uppercase tracking-[0.2em] text-[#0a87c4]">{eyebrow}</p><h1 className="mt-3 max-w-3xl text-5xl font-black leading-tight md:text-6xl">{title}</h1><p className="mt-5 max-w-2xl text-lg leading-8 text-white/75">{copy}</p></div>{side}</div></div></div>;
 }
 
-function ProfilePage({ profile, setProfile, navigate, savedVacancies }) {
+function ProfilePage({ profile, setProfile, navigate }) {
   const required = ['firstName', 'lastName', 'email', 'phone', 'postalCode', 'agreementInterest', 'preferredRegion', 'preferredStyle'];
   const strength = Math.round((required.filter((key) => String(profile[key] || '').trim()).length / required.length) * 100);
   const update = (field, value) => setProfile((current) => ({ ...current, [field]: value }));
@@ -254,9 +237,6 @@ function PubDetailPage({ pub, navigate, toggleSave, saved }) {
   const letAgreed = pub.availability === 'Let agreed';
   return <section><PageHero eyebrow="Pub opportunity" title={pub.pub} copy={pub.summary} navigate={navigate} side={<Card className="border-white/10 bg-white/10 text-white"><CardContent className="p-6"><p className="text-sm text-white/60">Agreement</p><p className="text-2xl font-black">{pub.agreement}</p><p className="mt-4 text-sm text-white/60">Status</p><p className="font-black">{pub.availability}</p></CardContent></Card>} /><div className="mx-auto grid max-w-7xl gap-6 px-5 py-12 lg:grid-cols-[1fr_360px] lg:px-8"><Card><CardContent className="p-6 md:p-8"><ImagePlaceholder pub={pub} large /><h2 className="mt-8 text-3xl font-black text-[#1c1c31]">Why this pub?</h2><p className="mt-4 leading-8 text-slate-600">{pub.area}</p><div className="mt-6 grid gap-3 md:grid-cols-2">{pub.features.map((item) => <div key={item} className="rounded-2xl bg-slate-50 p-4 font-bold text-[#1c1c31]"><Icon name="check" className="mb-2 text-[#0a87c4]" />{item}</div>)}</div></CardContent></Card><aside><Card><CardContent className="p-6"><h3 className="text-2xl font-black text-[#1c1c31]">Ready to apply?</h3><p className="mt-3 leading-7 text-slate-600">Start your application journey for this pub.</p><Button disabled={letAgreed} onClick={() => navigate('applicationJourney', pub.id)} className={`mt-5 w-full ${letAgreed ? 'bg-slate-500' : ''}`}>{letAgreed ? 'Let agreed' : 'Start application'}</Button><Button variant="light" className="mt-3 w-full" onClick={() => toggleSave(pub.id)}>{saved ? 'Saved' : 'Save pub'}</Button></CardContent></Card></aside></div></section>;
 }
-
-const journeySteps = ['Find a pub', 'Chat to us', 'Our resources', 'Business plan', 'Upload documents', 'Application form'];
-const journeyTiles = ['Your pub match', 'Your documents', 'Application form', 'Business plan', 'Additional support', 'Chat'];
 
 function ApplicationJourneyPage({ pub, navigate }) {
   const selectedPub = pub || vacancies[0];
@@ -292,14 +272,14 @@ function FloatingChatBubble({ navigate }) {
 }
 
 function runSelfTests() {
-  console.assert(filterVacancies(vacancies, '', ['Just Add Talent'], []).length === 2, 'Expected two JAT vacancies');
+  console.assert(filterVacancies(vacancies, '', ['Just Add Talent'], []).length === 2, 'Expected two Just Add Talent vacancies');
   console.assert(filterVacancies(vacancies, '', [], ['Beer garden']).length === 2, 'Expected beer garden filter to match two vacancies');
   console.assert(vacancies.find((pub) => pub.id === 2)?.image.includes('pearces-bar-edinburgh.jpg'), 'Expected Pearce’s Bar image to pull from GitHub Pages assets');
 }
 runSelfTests();
 
 export default function App() {
-  const [page, setPage] = useState('classic');
+  const [page, setPage] = useState('home');
   const [param, setParam] = useState(null);
   const [saved, setSaved] = useState([1, 3, 5]);
   const [profile, setProfile] = useState(initialProfile);
@@ -308,7 +288,21 @@ export default function App() {
   const navigate = (nextPage, nextParam = null) => { setPage(nextPage); setParam(nextParam); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const toggleSave = (id) => setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
 
-  const pageComponent = page === 'classic' ? <ClassicSitePage navigate={navigate} /> : page === 'profile' ? <ProfilePage profile={profile} setProfile={setProfile} navigate={navigate} savedVacancies={savedVacancies} /> : page === 'saved' ? <SavedPage savedVacancies={savedVacancies} toggleSave={toggleSave} navigate={navigate} /> : page === 'applications' ? <ApplicationsPage navigate={navigate} /> : page === 'applicationJourney' ? <ApplicationJourneyPage pub={currentPub} navigate={navigate} /> : page === 'pubDetail' ? <PubDetailPage pub={currentPub} navigate={navigate} toggleSave={toggleSave} saved={currentPub ? saved.includes(currentPub.id) : false} profile={profile} /> : page === 'similar' ? <SimilarPage sourcePub={currentPub} navigate={navigate} profile={profile} saved={saved} toggleSave={toggleSave} /> : page === 'signin' ? <SignInPage navigate={navigate} /> : <HomePage navigate={navigate} profile={profile} saved={saved} toggleSave={toggleSave} />;
+  const pageComponent = page === 'profile'
+    ? <ProfilePage profile={profile} setProfile={setProfile} navigate={navigate} savedVacancies={savedVacancies} />
+    : page === 'saved'
+      ? <SavedPage savedVacancies={savedVacancies} toggleSave={toggleSave} navigate={navigate} />
+      : page === 'applications'
+        ? <ApplicationsPage navigate={navigate} />
+        : page === 'applicationJourney'
+          ? <ApplicationJourneyPage pub={currentPub} navigate={navigate} />
+          : page === 'pubDetail'
+            ? <PubDetailPage pub={currentPub} navigate={navigate} toggleSave={toggleSave} saved={currentPub ? saved.includes(currentPub.id) : false} profile={profile} />
+            : page === 'similar'
+              ? <SimilarPage sourcePub={currentPub} navigate={navigate} profile={profile} saved={saved} toggleSave={toggleSave} />
+              : page === 'signin'
+                ? <SignInPage navigate={navigate} />
+                : <HomePage navigate={navigate} profile={profile} saved={saved} toggleSave={toggleSave} />;
 
-  return <main className="min-h-screen bg-slate-50 text-slate-900" style={{ fontFamily: page === 'classic' ? undefined : 'Montserrat, ui-sans-serif, system-ui, sans-serif' }}>{page !== 'classic' && <Header page={page} navigate={navigate} />}{pageComponent}{page !== 'classic' && <footer className="bg-[#1c1c31] px-5 py-10 text-white lg:px-8"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 md:flex-row md:items-center"><button onClick={() => navigate('classic')}><StarMark /></button><div className="flex flex-wrap items-center gap-3 text-sm font-bold"><button onClick={() => navigate('classic')} className="text-white/80 hover:text-white">Classic Site</button><span className="h-4 w-0.5 bg-white/35" /><button onClick={() => navigate('home')} className="text-white/80 hover:text-white">Portal home</button></div><p className="max-w-xl text-sm leading-7 text-white/65">Prototype for a standalone recruitment portal on starpubs.co.uk.</p></div></footer>}<FloatingChatBubble navigate={navigate} /></main>;
+  return <main className="min-h-screen bg-slate-50 text-slate-900" style={{ fontFamily: 'Montserrat, ui-sans-serif, system-ui, sans-serif' }}><Header page={page} navigate={navigate} />{pageComponent}<footer className="bg-[#1c1c31] px-5 py-10 text-white lg:px-8"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 md:flex-row md:items-center"><button onClick={() => navigate('home')}><StarMark /></button><div className="flex flex-wrap items-center gap-3 text-sm font-bold"><button onClick={() => navigate('home')} className="text-white/80 hover:text-white">Portal home</button><span className="h-4 w-0.5 bg-white/35" /><button onClick={() => navigate('applications')} className="text-white/80 hover:text-white">Applications</button></div><p className="max-w-xl text-sm leading-7 text-white/65">Prototype for a standalone recruitment portal on starpubs.co.uk.</p></div></footer><FloatingChatBubble navigate={navigate} /></main>;
 }

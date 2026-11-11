@@ -796,7 +796,172 @@ function FAQPage({ navigate }) {
 
 function FloatingChatBubble({ navigate }) {
   const [open, setOpen] = useState(false);
-  return <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3"><AnimatePresence>{open && <motion.div initial={{ opacity: 0, y: 12, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.96 }} className="w-[min(350px,calc(100vw-2.5rem))] rounded-[1.5rem] border border-slate-200 bg-white p-5 text-[#1c1c31] shadow-2xl"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[0.16em] text-[#0a87c4]">Need help?</p><h3 className="mt-1 text-xl font-black">Chat to Star Pubs</h3></div><button onClick={() => setOpen(false)} className="rounded-full bg-slate-100 p-2 text-slate-500"><Icon name="x" size={16} /></button></div><p className="mt-3 text-sm leading-6 text-slate-600">Ask about a pub, agreement type or the next step in your application.</p><div className="mt-4 grid gap-2"><Button className="w-full" onClick={() => navigate('applications')}>Application help</Button><Button variant="light" className="w-full" onClick={() => navigate('faqs')}>Browse FAQs</Button></div></motion.div>}</AnimatePresence><motion.button onClick={() => setOpen(!open)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }} className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0a87c4] text-white shadow-2xl ring-4 ring-white" aria-label="Open chat"><Icon name={open ? 'x' : 'message'} size={26} /></motion.button></div>;
+  const [input, setInput] = useState('');
+  const [typing, setTyping] = useState(false);
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      role: 'assistant',
+      text: 'Hi, I’m the Star Pubs recruitment assistant demo. I can help you find a pub, understand agreements, check what happens after you apply or point you to the right support.',
+      actions: [
+        { label: 'Find a pub', value: 'find-pub' },
+        { label: 'Compare agreements', value: 'agreements' },
+        { label: 'Application help', value: 'application' }
+      ]
+    }
+  ]);
+
+  const replyFor = (value) => {
+    const text = value.toLowerCase();
+    if (text.includes('find') || text.includes('vacan') || text.includes('pub')) {
+      return {
+        text: 'You can search opportunities by location, agreement type and pub features. If you already know the area or pub style you want, the vacancy search is the best place to start.',
+        actionLabel: 'Search pub vacancies',
+        actionPage: 'portalHome'
+      };
+    }
+    if (text.includes('agreement') || text.includes('just add talent') || text.includes('tenan')) {
+      return {
+        text: 'Star Pubs mainly recruits through Just Add Talent and Leased & Tenanted routes. The biggest differences are entry costs, operating responsibility, freedom over the offer and how you earn.',
+        actionLabel: 'Compare agreements',
+        actionPage: 'agreements'
+      };
+    }
+    if (text.includes('application') || text.includes('apply') || text.includes('progress')) {
+      return {
+        text: 'If you have already started an application, your applicant portal shows its status and next action. If you are still deciding whether to apply, the How to apply page explains the journey first.',
+        actionLabel: 'View applications',
+        actionPage: 'applications',
+        secondaryLabel: 'How to apply',
+        secondaryPage: 'process'
+      };
+    }
+    if (text.includes('event') || text.includes('training') || text.includes('support')) {
+      return {
+        text: 'Support starts before opening. Training, recruitment events, Business Development Manager support and practical resources all form part of the wider journey.',
+        actionLabel: 'Support & events',
+        actionPage: 'support'
+      };
+    }
+    if (text.includes('contact') || text.includes('person') || text.includes('team') || text.includes('phone')) {
+      return {
+        text: 'You can contact the pub recruitment team if you want to discuss a specific pub, agreement type, entry requirements or the application process.',
+        actionLabel: 'Contact recruitment',
+        actionPage: 'contact'
+      };
+    }
+    if (text.includes('cost') || text.includes('money') || text.includes('£') || text.includes('earn')) {
+      return {
+        text: 'Costs vary by agreement and pub. Just Add Talent currently requires £4,000 in unborrowed funds. Leased & Tenanted entry costs are pub-specific, so always check the individual opportunity details.',
+        actionLabel: 'Read money & costs FAQs',
+        actionPage: 'faqs'
+      };
+    }
+    if (text.includes('first') || text.includes('experience') || text.includes('new')) {
+      return {
+        text: 'You do not need previous pub experience for every opportunity. Transferable skills in leadership, customer service, retail, finance and people management can all be relevant depending on the pub and agreement.',
+        actionLabel: 'Why Star Pubs',
+        actionPage: 'whyStar'
+      };
+    }
+    return {
+      text: 'I can help with vacancies, agreement types, entry costs, training, applications, recruitment events or speaking to the team. Choose one of the options below or ask another question.',
+      actionLabel: 'Browse FAQs',
+      actionPage: 'faqs'
+    };
+  };
+
+  const quickOptions = [
+    { label: 'Find a pub', value: 'find a pub' },
+    { label: 'Agreement types', value: 'agreement types' },
+    { label: 'Entry costs', value: 'entry costs' },
+    { label: 'Application progress', value: 'application progress' },
+    { label: 'Training & events', value: 'training and events' },
+    { label: 'Talk to the team', value: 'contact recruitment team' }
+  ];
+
+  const sendMessage = (value) => {
+    const clean = value.trim();
+    if (!clean || typing) return;
+    const userMessage = { id: Date.now(), role: 'user', text: clean };
+    setMessages((current) => [...current, userMessage]);
+    setInput('');
+    setTyping(true);
+    const reply = replyFor(clean);
+    window.setTimeout(() => {
+      setMessages((current) => [...current, {
+        id: Date.now() + 1,
+        role: 'assistant',
+        text: reply.text,
+        actionLabel: reply.actionLabel,
+        actionPage: reply.actionPage,
+        secondaryLabel: reply.secondaryLabel,
+        secondaryPage: reply.secondaryPage
+      }]);
+      setTyping(false);
+    }, 550);
+  };
+
+  const handleAction = (message) => {
+    if (message.actionPage) navigate(message.actionPage);
+  };
+
+  const restart = () => {
+    setInput('');
+    setTyping(false);
+    setMessages([{
+      id: Date.now(),
+      role: 'assistant',
+      text: 'Hi, I’m the Star Pubs recruitment assistant demo. What can I help you with?',
+      actions: [
+        { label: 'Find a pub', value: 'find-pub' },
+        { label: 'Compare agreements', value: 'agreements' },
+        { label: 'Application help', value: 'application' }
+      ]
+    }]);
+  };
+
+  return <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+    <AnimatePresence>{open && <motion.div initial={{ opacity: 0, y: 12, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.96 }} className="flex h-[min(650px,calc(100vh-7rem))] w-[min(390px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white text-[#1c1c31] shadow-2xl">
+      <div className="bg-[#1c1c31] p-4 text-white">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-[#0a87c4]"><Icon name="message" size={20} /><span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-[#1c1c31] bg-green-400" /></span>
+            <div><p className="text-xs font-black uppercase tracking-[0.16em] text-[#47b9ea]">Recruitment assistant</p><h3 className="mt-0.5 text-lg font-black">Star Pubs chat demo</h3><p className="mt-0.5 text-[11px] text-white/55">Scripted prototype — not live chat</p></div>
+          </div>
+          <button onClick={() => setOpen(false)} className="rounded-full bg-white/10 p-2 text-white/75 transition hover:bg-white/15 hover:text-white" aria-label="Close chat"><Icon name="x" size={16} /></button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto bg-[#f7f9fb] p-4">
+        <div className="grid gap-3">
+          {messages.map((message) => <div key={message.id} className={cx('flex', message.role === 'user' ? 'justify-end' : 'justify-start')}>
+            <div className={cx('max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm', message.role === 'user' ? 'rounded-br-md bg-[#0a87c4] text-white' : 'rounded-bl-md border border-slate-200 bg-white text-slate-700')}>
+              <p>{message.text}</p>
+              {message.actions && <div className="mt-3 grid gap-2">{message.actions.map((action) => <button key={action.label} onClick={() => sendMessage(action.value)} className="rounded-lg border border-[#0a87c4]/25 bg-[#eaf6fd] px-3 py-2 text-left text-xs font-black text-[#086f9f] transition hover:border-[#0a87c4]">{action.label}</button>)}</div>}
+              {message.actionPage && <div className="mt-3 flex flex-wrap gap-2"><button onClick={() => handleAction(message)} className="rounded-lg bg-[#1c1c31] px-3 py-2 text-xs font-black text-white">{message.actionLabel}</button>{message.secondaryPage && <button onClick={() => navigate(message.secondaryPage)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-black text-[#1c1c31]">{message.secondaryLabel}</button>}</div>}
+            </div>
+          </div>)}
+          {typing && <div className="flex justify-start"><div className="rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 shadow-sm"><div className="flex gap-1"><span className="h-2 w-2 animate-bounce rounded-full bg-slate-400 [animation-delay:-0.2s]" /><span className="h-2 w-2 animate-bounce rounded-full bg-slate-400 [animation-delay:-0.1s]" /><span className="h-2 w-2 animate-bounce rounded-full bg-slate-400" /></div></div></div>}
+        </div>
+      </div>
+
+      <div className="border-t border-slate-200 bg-white p-3">
+        <div className="flex gap-2 overflow-x-auto pb-2">{quickOptions.map((option) => <button key={option.label} onClick={() => sendMessage(option.value)} className="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-black text-slate-600 transition hover:border-[#0a87c4] hover:text-[#0a87c4]">{option.label}</button>)}</div>
+        <form onSubmit={(e) => { e.preventDefault(); sendMessage(input); }} className="mt-2 flex items-end gap-2">
+          <textarea rows="1" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input); } }} placeholder="Ask a recruitment question..." className="min-h-[46px] max-h-28 flex-1 resize-none rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-[#0a87c4] focus:ring-4 focus:ring-[#0a87c4]/10" />
+          <button type="submit" disabled={!input.trim() || typing} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0a87c4] text-white transition hover:bg-[#0877ad] disabled:opacity-40" aria-label="Send message"><Icon name="arrow" size={18} /></button>
+        </form>
+        <div className="mt-2 flex items-center justify-between gap-3"><p className="text-[10px] leading-4 text-slate-400">Demo answers are scripted for leadership review.</p><button onClick={restart} className="text-[10px] font-black text-[#0a87c4]">Restart</button></div>
+      </div>
+    </motion.div>}</AnimatePresence>
+
+    {!open && <div className="rounded-full bg-[#1c1c31] px-3 py-1.5 text-[11px] font-black text-white shadow-lg">Need help?</div>}
+    <motion.button onClick={() => setOpen(!open)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }} className="relative flex h-16 w-16 items-center justify-center rounded-full bg-[#0a87c4] text-white shadow-2xl ring-4 ring-white" aria-label="Open recruitment chat">
+      <Icon name={open ? 'x' : 'message'} size={26} />
+      {!open && <span className="absolute right-0 top-0 h-4 w-4 rounded-full border-2 border-white bg-green-400" />}
+    </motion.button>
+  </div>;
 }
 
 function Footer({ navigate, portal = false }) {

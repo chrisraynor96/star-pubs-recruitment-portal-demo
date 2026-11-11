@@ -1,0 +1,21 @@
+@using Newtonsoft.Json
+@{
+    // Optional page-template field. If it does not exist or is empty, open the public homepage.
+    var routeField = Sitecore.Context.Item.Fields["App Route"];
+    var initialPage = routeField != null && !string.IsNullOrWhiteSpace(routeField.Value)
+        ? routeField.Value
+        : "siteHome";
+
+    var runtimeConfig = new
+    {
+        assetBase = "/Assets/StarPubsRecruitment/",
+        initialPage = initialPage,
+        signedIn = false
+    };
+}
+<link rel="stylesheet" href="/Assets/StarPubsRecruitment/assets/app.css" />
+<div id="root" data-sitecore-rendering="star-pubs-recruitment"></div>
+<script>
+    window.__STAR_PUBS_CONFIG__ = @Html.Raw(JsonConvert.SerializeObject(runtimeConfig));
+</script>
+<script type="module" src="/Assets/StarPubsRecruitment/assets/app.js"></script>

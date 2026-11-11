@@ -356,8 +356,32 @@ function AccountMenu({ profile, navigate, onLogout }) {
 
 function PublicHeader({ page, navigate, signedIn, profile, onLogout }) {
   const [open, setOpen] = useState(false);
-  const nav = [['portalHome', 'Find a pub'], ['agreements', 'Our agreements'], ['faqs', 'FAQs']];
-  return <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur"><div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4 lg:px-8"><button onClick={() => navigate('siteHome')} aria-label="Star Pubs home"><StarLogo mode="dark" /></button><nav className="hidden items-center gap-7 text-sm font-black text-[#1c1c31] md:flex">{nav.map(([target, label]) => <button key={target} onClick={() => navigate(target)} className={cx('transition hover:text-[#0a87c4]', page === target && 'text-[#0a87c4]')}>{label}</button>)}</nav><div className="hidden items-center gap-3 md:flex">{signedIn ? <><Button variant="light" onClick={() => navigate('portalHome')}>Applicant portal</Button><AccountMenu profile={profile} navigate={navigate} onLogout={onLogout} /></> : <><Button variant="light" onClick={() => navigate('signin')}>Sign in</Button><Button onClick={() => navigate('portalHome')}>Find a pub</Button></>}</div><button className="rounded-lg p-2 text-[#1c1c31] md:hidden" onClick={() => setOpen(!open)} aria-label="Open menu"><Icon name={open ? 'x' : 'menu'} /></button></div><AnimatePresence>{open && <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden border-t border-slate-200 bg-white md:hidden"><div className="grid gap-2 px-5 py-4">{nav.map(([target, label]) => <button key={target} className="rounded-lg px-3 py-3 text-left text-sm font-black text-[#1c1c31] hover:bg-slate-50" onClick={() => { setOpen(false); navigate(target); }}>{label}</button>)}<Button onClick={() => { setOpen(false); navigate(signedIn ? 'portalHome' : 'signin'); }}>{signedIn ? 'Applicant portal' : 'Sign in'}</Button></div></motion.div>}</AnimatePresence></header>;
+  const nav = [
+    ['portalHome', 'Find a pub'],
+    ['whyStar', 'Why Star'],
+    ['agreements', 'Agreements'],
+    ['process', 'How to apply'],
+    ['support', 'Support & events'],
+    ['faqs', 'FAQs']
+  ];
+  return <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4 lg:px-8">
+      <button onClick={() => navigate('siteHome')} aria-label="Star Pubs home"><StarLogo mode="dark" /></button>
+      <nav className="hidden items-center gap-5 text-[13px] font-black text-[#1c1c31] xl:flex">
+        {nav.map(([target, label]) => <button key={target} onClick={() => navigate(target)} className={cx('transition hover:text-[#0a87c4]', page === target && 'text-[#0a87c4]')}>{label}</button>)}
+      </nav>
+      <div className="hidden items-center gap-3 md:flex">
+        {signedIn ? <><Button variant="light" onClick={() => navigate('portalHome')}>Applicant portal</Button><AccountMenu profile={profile} navigate={navigate} onLogout={onLogout} /></> : <><Button variant="light" onClick={() => navigate('signin')}>Sign in</Button><Button onClick={() => navigate('portalHome')}>Find a pub</Button></>}
+      </div>
+      <button className="rounded-lg p-2 text-[#1c1c31] xl:hidden" onClick={() => setOpen(!open)} aria-label="Open menu"><Icon name={open ? 'x' : 'menu'} /></button>
+    </div>
+    <AnimatePresence>{open && <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden border-t border-slate-200 bg-white xl:hidden">
+      <div className="grid gap-1 px-5 py-4">
+        {nav.map(([target, label]) => <button key={target} className="rounded-lg px-3 py-3 text-left text-sm font-black text-[#1c1c31] hover:bg-slate-50" onClick={() => { setOpen(false); navigate(target); }}>{label}</button>)}
+        {!signedIn && <Button className="mt-2" onClick={() => { setOpen(false); navigate('signin'); }}>Sign in</Button>}
+      </div>
+    </motion.div>}</AnimatePresence>
+  </header>;
 }
 
 function PortalHeader({ page, navigate, signedIn, profile, onLogout }) {
@@ -372,15 +396,157 @@ function HeroImage({ src, alt, children, overlay = 'strong' }) {
 }
 
 function PublicHomePage({ navigate, signedIn }) {
+  const [search, setSearch] = useState('');
   const featured = vacancies.filter((v) => v.availability === 'Available').slice(0, 3);
-  return <><section className="relative isolate overflow-hidden bg-[#1c1c31] text-white"><HeroImage src={asset('home-banner.jpg')} alt="Star Pubs pub interior" overlay="gradient" /><div className="relative mx-auto grid min-h-[620px] max-w-7xl items-center gap-10 px-5 py-20 lg:grid-cols-[1.05fr_0.75fr] lg:px-8"><motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}><p className="text-xs font-black uppercase tracking-[0.24em] text-[#47b9ea]">Run a pub with Star Pubs</p><h1 className="mt-4 max-w-4xl text-5xl font-black leading-[0.98] tracking-tight md:text-7xl">Find the pub opportunity that fits your ambition.</h1><p className="mt-6 max-w-2xl text-lg leading-8 text-white/80">Explore available pubs, understand the agreement options and move from discovery to application in one connected journey.</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><Button className="px-7 py-4 text-base" onClick={() => navigate('portalHome')}>Find a pub <Icon name="arrow" size={18} /></Button><Button variant="ghost" className="px-7 py-4 text-base" onClick={() => navigate(signedIn ? 'portalHome' : 'signin')}>{signedIn ? 'Open applicant portal' : 'Sign in / create profile'}</Button></div></motion.div><div className="rounded-[2rem] border border-white/15 bg-white/10 p-6 backdrop-blur-md"><p className="text-sm font-black uppercase tracking-[0.18em] text-[#47b9ea]">A clearer route to running a pub</p><div className="mt-6 grid gap-4">{[['1', 'Discover', 'Search by location, agreement and pub style.'], ['2', 'Shortlist', 'Save the pubs that feel right and compare options.'], ['3', 'Apply', 'Move through your application in one place.']].map(([number, title, copy]) => <div key={number} className="flex gap-4 rounded-2xl bg-white/10 p-4"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0a87c4] font-black">{number}</span><div><p className="font-black">{title}</p><p className="mt-1 text-sm leading-6 text-white/70">{copy}</p></div></div>)}</div></div></div></section>
-  <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8"><SectionHeading eyebrow="Choose your route" title="Different ways to run a Star Pubs pub" copy="Start with the operating model that feels closest to what you want, then explore the individual pub opportunities available on that route." /><div className="mt-8 grid gap-5 lg:grid-cols-3">{[
-    ['Just Add Talent', 'A supported management agreement with a lower entry point and a defined core offer.', 'Just Add Talent'],
-    ['Leased & Tenanted', 'Run your own pub business with more freedom to shape the offer and trading plan.', 'Leased & Tenanted'],
-    ['Investment opportunities', 'Explore pubs where planned investment can help unlock the next chapter.', 'Investment Tenancy Agreement']
-  ].map(([title, copy, agreement]) => <button key={title} onClick={() => navigate('portalHome', null, {agreement})} className="group rounded-[1.75rem] border border-slate-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:border-[#0a87c4]/40 hover:shadow-xl"><span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eaf6fd] text-[#0a87c4]"><Icon name="building" /></span><h3 className="mt-5 text-2xl font-black text-[#1c1c31]">{title}</h3><p className="mt-3 leading-7 text-slate-600">{copy}</p><span className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#0a87c4]">Explore opportunities <Icon name="arrow" size={16} /></span></button>)}</div></section>
-  <section className="bg-[#eaf6fd]"><div className="mx-auto max-w-7xl px-5 py-16 lg:px-8"><SectionHeading eyebrow="Featured opportunities" title="A few pubs to get you started" copy="Browse current examples, then use the applicant portal to filter the wider vacancy list around what matters to you." /><div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{featured.map((pub) => <PublicPubCard key={pub.id} pub={pub} navigate={navigate} />)}</div><div className="mt-8"><Button onClick={() => navigate('portalHome')}>View all pub opportunities</Button></div></div></section>
-  <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8"><div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center"><div><SectionHeading eyebrow="Support from day one" title="Understand the opportunity before you commit" copy="Use the FAQs and agreement guides to understand costs, responsibilities, training and what happens after you apply." /><div className="mt-6 flex flex-wrap gap-3"><Button onClick={() => navigate('faqs')}>Read the FAQs</Button><Button variant="light" onClick={() => navigate('agreements')}>Compare agreements</Button></div></div><img src={asset('dream-pub-studio.jpg')} alt="Star Pubs support" className="h-[360px] w-full rounded-[2rem] object-cover shadow-xl" /></div></section></>;
+  const submitSearch = (e) => { e.preventDefault(); navigate('portalHome', null, { query: search }); };
+  const processSteps = [
+    ['1', 'Find the right pub', 'Search opportunities and compare agreement types.'],
+    ['2', 'Talk to us', 'A Licensee Attraction Manager gets to know you and your plans.'],
+    ['3', 'Explore the opportunity', 'Meet the team, understand the pub and ask questions.'],
+    ['4', 'Plan and prepare', 'Complete the training, checks and business planning for your route.'],
+    ['5', 'Finalise', 'Review the commercial and legal details before you commit.'],
+    ['6', 'Get started', 'Open the doors with ongoing Star Pubs support behind you.']
+  ];
+  return <>
+    <section className="relative isolate overflow-hidden bg-[#1c1c31] text-white">
+      <HeroImage src={asset('home-banner.jpg')} alt="Star Pubs pub interior" overlay="gradient" />
+      <div className="relative mx-auto grid min-h-[650px] max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[1.08fr_0.72fr] lg:px-8">
+        <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-[#47b9ea]">Run a pub with Star Pubs</p>
+          <h1 className="mt-4 max-w-4xl text-5xl font-black leading-[0.98] tracking-tight md:text-7xl">Your next pub starts here.</h1>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-white/82">Find an opportunity, understand the commercial model and move through your application with clear support at every stage.</p>
+          <form onSubmit={submitSearch} className="mt-8 flex max-w-2xl flex-col gap-3 rounded-2xl bg-white p-3 shadow-2xl sm:flex-row">
+            <label className="flex flex-1 items-center gap-3 px-3 text-[#1c1c31]">
+              <Icon name="search" className="shrink-0 text-[#0a87c4]" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by town, county or pub name" className="w-full bg-transparent py-3 text-sm outline-none" />
+            </label>
+            <Button type="submit" className="px-7 py-4">Search pubs</Button>
+          </form>
+          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-white/70">
+            <span className="flex items-center gap-2"><Icon name="check" size={16} className="text-[#47b9ea]" />Opportunities across England, Scotland and Wales</span>
+            <span className="flex items-center gap-2"><Icon name="check" size={16} className="text-[#47b9ea]" />First-time and experienced operators welcome</span>
+          </div>
+        </motion.div>
+        <div className="rounded-[2rem] border border-white/15 bg-white/10 p-6 backdrop-blur-md">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-[#47b9ea]">Not sure where to start?</p>
+          <h2 className="mt-2 text-3xl font-black">Start with the route that sounds like you.</h2>
+          <div className="mt-6 grid gap-3">
+            {[
+              ['My first pub', 'Understand the basics, entry requirements and support available.'],
+              ['I already run pubs', 'Find the right scale, agreement and commercial opportunity.'],
+              ['I want to grow a portfolio', 'Explore opportunities suited to experienced and multi-site operators.']
+            ].map(([title, copy]) => <button key={title} onClick={() => navigate('whyStar')} className="group rounded-2xl bg-white px-5 py-4 text-left text-[#1c1c31] transition hover:-translate-y-0.5 hover:shadow-xl"><div className="flex items-center justify-between gap-4"><div><p className="font-black">{title}</p><p className="mt-1 text-sm leading-6 text-slate-600">{copy}</p></div><Icon name="arrow" className="shrink-0 text-[#0a87c4]" /></div></button>)}
+          </div>
+          <Button variant="ghost" className="mt-5 w-full" onClick={() => navigate(signedIn ? 'portalHome' : 'signin')}>{signedIn ? 'Open applicant portal' : 'Sign in / create profile'}</Button>
+        </div>
+      </div>
+    </section>
+
+    <section className="border-b border-slate-200 bg-white">
+      <div className="mx-auto grid max-w-7xl gap-0 px-5 py-6 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
+        {[
+          ['2', 'main agreement routes', 'Just Add Talent and Leased & Tenanted'],
+          ['£4,000', 'JAT entry funds', 'Current unborrowed-funds requirement'],
+          ['3 nations', 'across Great Britain', 'England, Scotland and Wales'],
+          ['Ongoing', 'training & support', 'Before opening and while you trade']
+        ].map(([value, label, copy]) => <div key={label} className="border-slate-200 px-4 py-4 first:pl-0 lg:border-r lg:last:border-r-0"><p className="text-3xl font-black text-[#0a87c4]">{value}</p><p className="mt-1 font-black text-[#1c1c31]">{label}</p><p className="mt-1 text-xs leading-5 text-slate-500">{copy}</p></div>)}
+      </div>
+    </section>
+
+    <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+      <SectionHeading eyebrow="Choose your route" title="Different ways to run a Star Pubs pub" copy="The agreement shapes your entry costs, responsibilities, freedom and how you earn. Start with the commercial model, then choose the pub." />
+      <div className="mt-8 grid gap-5 lg:grid-cols-3">
+        {[
+          ['Just Add Talent', 'Management Agreement', 'A supported route with a lower entry point and a defined core offer.', ['£4,000 unborrowed funds', 'No rent, utilities, rates or maintenance costs', 'Weekly revenue share + quarterly profit share'], 'Just Add Talent'],
+          ['Foundation Tenancy', 'Leased & Tenanted', 'Run your own pub business with more freedom to shape the offer and trading plan.', ['Pub-specific entry costs', 'Fixed rent for the term', 'More freedom over the retail offer'], 'Leased & Tenanted'],
+          ['Investment Tenancy', 'Leased & Tenanted', 'For qualifying pubs where planned investment can unlock the next chapter.', ['Planned investment', 'Pub-specific rent and entry costs', 'Longer-term commercial plan'], 'Investment Tenancy Agreement']
+        ].map(([title, eyebrow, copy, bullets, agreement]) => <article key={title} className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0a87c4]">{eyebrow}</p>
+          <h3 className="mt-2 text-2xl font-black text-[#1c1c31]">{title}</h3>
+          <p className="mt-3 leading-7 text-slate-600">{copy}</p>
+          <ul className="mt-5 grid gap-3">{bullets.map((bullet) => <li key={bullet} className="flex gap-2 text-sm leading-6 text-slate-600"><Icon name="check" size={17} className="mt-0.5 shrink-0 text-[#0a87c4]" />{bullet}</li>)}</ul>
+          <Button variant="light" className="mt-6 w-full" onClick={() => navigate('portalHome', null, { agreement })}>View matching pubs</Button>
+        </article>)}
+      </div>
+      <button onClick={() => navigate('agreements')} className="mt-6 inline-flex items-center gap-2 text-sm font-black text-[#0a87c4]">Compare all agreement details <Icon name="arrow" size={16} /></button>
+    </section>
+
+    <section className="bg-[#eaf6fd]">
+      <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+        <SectionHeading eyebrow="Your application journey" title="Know what happens before you apply" copy="A clear process helps you decide whether the pub, agreement and Star Pubs are right for you. Exact steps vary by agreement." />
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {processSteps.map(([number, title, copy]) => <div key={number} className="rounded-[1.5rem] bg-white p-5 shadow-sm"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0a87c4] text-sm font-black text-white">{number}</span><h3 className="mt-4 text-lg font-black text-[#1c1c31]">{title}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p></div>)}
+        </div>
+        <Button variant="navy" className="mt-7" onClick={() => navigate('process')}>See the full application process</Button>
+      </div>
+    </section>
+
+    <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+      <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+        <div className="rounded-[2rem] bg-[#1c1c31] p-7 text-white md:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#47b9ea]">Is running a pub right for you?</p>
+          <h2 className="mt-3 text-3xl font-black">A strong application starts with a realistic view of the role.</h2>
+          <div className="mt-6 grid gap-3">
+            {['I enjoy leading people and creating great customer experiences.', 'I am comfortable being commercially accountable for results.', 'I understand hospitality can involve evenings, weekends and busy trading periods.', 'I am ready to complete training, checks and planning before taking on a pub.'].map((item) => <div key={item} className="flex gap-3 rounded-xl bg-white/10 p-4 text-sm leading-6 text-white/80"><Icon name="check" className="mt-0.5 shrink-0 text-[#47b9ea]" />{item}</div>)}
+          </div>
+          <Button className="mt-6" onClick={() => navigate(signedIn ? 'profile' : 'signin')}>{signedIn ? 'Update my profile' : 'Create my applicant profile'}</Button>
+        </div>
+        <div>
+          <SectionHeading eyebrow="Who we recruit" title="There is more than one route into running a pub" copy="Your experience level helps shape which pubs and agreements are likely to suit you." />
+          <div className="mt-6 grid gap-4">
+            {[
+              ['First-time publicans', 'Transferable skills in leadership, customer service, retail, finance or people management can all be relevant.'],
+              ['Experienced licensees', 'Use your track record to find a pub with the right scale, trading style and commercial freedom.'],
+              ['Multi-site and growing operators', 'Explore larger or more complex opportunities that fit your operating model and ambitions.']
+            ].map(([title, copy]) => <div key={title} className="rounded-2xl border border-slate-200 bg-white p-5"><h3 className="font-black text-[#1c1c31]">{title}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p></div>)}
+          </div>
+          <button onClick={() => navigate('whyStar')} className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#0a87c4]">See why operators choose Star Pubs <Icon name="arrow" size={16} /></button>
+        </div>
+      </div>
+    </section>
+
+    <section className="bg-white">
+      <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+        <SectionHeading eyebrow="Featured opportunities" title="A few pubs to get you started" copy="Explore current examples, then use the applicant portal to narrow the wider vacancy list around your experience and preferences." />
+        <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{featured.map((pub) => <PublicPubCard key={pub.id} pub={pub} navigate={navigate} />)}</div>
+        <div className="mt-8"><Button onClick={() => navigate('portalHome')}>View all pub opportunities</Button></div>
+      </div>
+    </section>
+
+    <section className="bg-[#1c1c31] text-white">
+      <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+        <SectionHeading eyebrow="Training, support & events" title="Support before opening, and while you trade" copy="From pre-entry training and business planning to Business Development Manager support, marketing resources and recruitment events." />
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            ['Training', 'Structured pre-entry learning plus ongoing development once you are trading.', 'file'],
+            ['Business support', 'Guidance from Star Pubs teams and your Business Development Manager.', 'user'],
+            ['Marketing & tools', 'Resources designed to help you build footfall and run the pub effectively.', 'sparkle'],
+            ['Recruitment events', 'Open Days, Discovery Days and investment showcases give you a chance to meet us.', 'message']
+          ].map(([title, copy, icon]) => <div key={title} className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0a87c4]"><Icon name={icon} /></span><h3 className="mt-4 text-lg font-black">{title}</h3><p className="mt-2 text-sm leading-6 text-white/65">{copy}</p></div>)}
+        </div>
+        <Button variant="ghost" className="mt-7" onClick={() => navigate('support')}>Explore support & events</Button>
+      </div>
+    </section>
+
+    <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+      <div className="grid gap-8 lg:grid-cols-2">
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-7">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#0a87c4]">Stay in the loop</p>
+          <h2 className="mt-2 text-3xl font-black text-[#1c1c31]">Get vacancy alerts that match your search</h2>
+          <p className="mt-3 leading-7 text-slate-600">A complete recruitment journey should let candidates keep looking even when the right pub is not available today.</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto]"><input placeholder="Email address" className="rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-[#0a87c4]" /><Button onClick={() => navigate('signin')}>Set up alerts</Button></div>
+          <p className="mt-3 text-xs leading-5 text-slate-400">Leadership prototype: alert preferences would be saved to the applicant account.</p>
+        </div>
+        <div className="rounded-[2rem] bg-[#eaf6fd] p-7">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#0a87c4]">Need to talk it through?</p>
+          <h2 className="mt-2 text-3xl font-black text-[#1c1c31]">Speak to the pub recruitment team</h2>
+          <p className="mt-3 leading-7 text-slate-600">Questions about an opportunity, agreement or application? The recruitment team can point you in the right direction.</p>
+          <div className="mt-5 grid gap-2 text-sm font-bold text-[#1c1c31]"><span>08085 94 95 96</span><span>pubrecruitment@starpubs.co.uk</span><span className="font-semibold text-slate-500">Monday to Friday, 9am–5pm</span></div>
+          <Button variant="navy" className="mt-5" onClick={() => navigate('contact')}>Contact the team</Button>
+        </div>
+      </div>
+    </section>
+  </>;
 }
 
 function PublicPubCard({ pub, navigate }) {
@@ -389,11 +555,71 @@ function PublicPubCard({ pub, navigate }) {
 
 function AgreementsPage({ navigate }) {
   const cards = [
-    { title: 'Just Add Talent', eyebrow: 'Management Agreement', copy: 'A centrally supported route where Star Pubs sets the core retail offer and covers most major operating costs.', points: ['£4,000 in unborrowed funds', 'Weekly revenue share', '20% quarterly net operating profit share', 'You recruit and manage the pub team'] },
-    { title: 'Foundation Tenancy', eyebrow: 'Leased & Tenanted', copy: 'A fixed-term tenancy designed to give you more control over the pub business and a clear commercial framework.', points: ['More freedom over the retail offer', 'Fixed rent for the term', 'Reduced repair obligations', 'Pub-specific entry costs'] },
-    { title: 'Investment Tenancy', eyebrow: 'Leased & Tenanted', copy: 'A tenancy for qualifying pubs where investment forms part of the opportunity and longer-term commercial plan.', points: ['Planned investment', 'Five-year structure varies by nation', 'Reduced repair obligations', 'Pub-specific rent and entry costs'] }
+    { title: 'Just Add Talent', eyebrow: 'Management Agreement', copy: 'A centrally supported route where Star Pubs sets the core pub offer and covers most major operating costs.', points: ['£4,000 in unborrowed funds', 'No rent, utilities, business rates or maintenance costs', 'Weekly revenue share between 20% and 30% of net turnover', '20% of net operating profit paid quarterly', 'You recruit, employ and manage the pub team'] },
+    { title: 'Foundation Tenancy', eyebrow: 'Leased & Tenanted', copy: 'A fixed-term tenancy that gives you more freedom to shape the pub business within a clear commercial framework.', points: ['Pub-specific entry costs', 'Fixed rent for the term', 'Reduced repair obligations', 'More freedom over the pub offer', 'Beer, cider, alcopops and soft drinks tie'] },
+    { title: 'Investment Tenancy', eyebrow: 'Leased & Tenanted', copy: 'A tenancy for qualifying pubs where investment forms part of the long-term opportunity.', points: ['Planned pub investment', 'Pub-specific rent and entry costs', 'Reduced repair obligations', 'Longer-term commercial plan', 'Beer, cider, alcopops and soft drinks tie'] }
   ];
-  return <><section className="bg-[#1c1c31] text-white"><div className="mx-auto max-w-7xl px-5 py-16 lg:px-8"><p className="text-xs font-black uppercase tracking-[0.22em] text-[#47b9ea]">Our agreements</p><h1 className="mt-3 max-w-4xl text-5xl font-black md:text-6xl">Choose the operating model that fits your ambition.</h1><p className="mt-5 max-w-3xl text-lg leading-8 text-white/75">The agreement shapes your entry costs, responsibilities, freedom and how you earn. Compare the routes before you shortlist individual pubs.</p></div></section><section className="mx-auto max-w-7xl px-5 py-14 lg:px-8"><div className="grid gap-5 lg:grid-cols-3">{cards.map((card) => <article key={card.title} className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm"><p className="text-xs font-black uppercase tracking-[0.16em] text-[#0a87c4]">{card.eyebrow}</p><h2 className="mt-2 text-3xl font-black text-[#1c1c31]">{card.title}</h2><p className="mt-4 leading-7 text-slate-600">{card.copy}</p><ul className="mt-5 grid gap-3">{card.points.map((point) => <li key={point} className="flex gap-3 text-sm leading-6 text-slate-700"><Icon name="check" size={18} className="mt-0.5 shrink-0 text-[#0a87c4]" />{point}</li>)}</ul><Button className="mt-6 w-full" onClick={() => navigate('portalHome', null, {agreement: card.title === 'Just Add Talent' ? 'Just Add Talent' : card.title === 'Investment Tenancy' ? 'Investment Tenancy Agreement' : 'Leased & Tenanted'})}>View matching pubs</Button></article>)}</div><div className="mt-10 rounded-[2rem] bg-[#eaf6fd] p-6 md:p-8"><h2 className="text-2xl font-black text-[#1c1c31]">Need more detail?</h2><p className="mt-2 max-w-3xl leading-7 text-slate-600">The FAQ page covers the drinks tie, entry costs, training, application stages, rent and responsibilities in more depth.</p><Button variant="navy" className="mt-5" onClick={() => navigate('faqs')}>Read agreement FAQs</Button></div></section></>;
+  return <><PageHero eyebrow="Our agreements" title="Understand the commercial model before you choose the pub." copy="Entry costs, responsibilities, freedom and earnings differ by agreement. Use this page to compare the routes before you shortlist opportunities." backgroundImage={asset('StarPubs-Lifestyle-18.jpg')} />
+    <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
+      <div className="grid gap-5 lg:grid-cols-3">{cards.map((card) => <article key={card.title} className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0a87c4]">{card.eyebrow}</p><h2 className="mt-2 text-3xl font-black text-[#1c1c31]">{card.title}</h2><p className="mt-4 leading-7 text-slate-600">{card.copy}</p>
+        <ul className="mt-5 grid gap-3">{card.points.map((point) => <li key={point} className="flex gap-3 text-sm leading-6 text-slate-700"><Icon name="check" size={18} className="mt-0.5 shrink-0 text-[#0a87c4]" />{point}</li>)}</ul>
+        <Button className="mt-6 w-full" onClick={() => navigate('portalHome', null, { agreement: card.title === 'Just Add Talent' ? 'Just Add Talent' : card.title === 'Investment Tenancy' ? 'Investment Tenancy Agreement' : 'Leased & Tenanted' })}>View matching pubs</Button>
+      </article>)}</div>
+      <div className="mt-10 grid gap-5 lg:grid-cols-2">
+        <div className="rounded-[2rem] bg-[#eaf6fd] p-7"><h2 className="text-2xl font-black text-[#1c1c31]">Before you commit</h2><p className="mt-3 leading-7 text-slate-600">Every pub is different. Review the pub-specific commercial information, understand the tie and take independent legal and financial advice before signing an agreement.</p><Button variant="navy" className="mt-5" onClick={() => navigate('faqs')}>Read agreement FAQs</Button></div>
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[#1c1c31]">Not sure which route fits?</h2><p className="mt-3 leading-7 text-slate-600">Build an applicant profile around your experience, preferred region and operating style, then use the portal to see relevant opportunities.</p><Button className="mt-5" onClick={() => navigate('signin')}>Create profile</Button></div>
+      </div>
+    </section>
+  </>;
+}
+
+function WhyStarPage({ navigate }) {
+  const support = [
+    ['Training that starts before day one', 'Pre-entry programmes help you understand the commercial, operational and people side of running the pub.', 'file'],
+    ['A Business Development Manager', 'Ongoing business support once you are trading, tailored to the pub and agreement.', 'user'],
+    ['Marketing and digital resources', 'Tools, guidance and campaigns to help you build awareness and footfall.', 'sparkle'],
+    ['Operational expertise', 'Support across areas such as drinks quality, compliance, food and pub operations.', 'building'],
+    ['A national estate with local opportunity', 'Community locals, premium bars, destination pubs and more across Great Britain.', 'pin'],
+    ['A route for different experience levels', 'Opportunities for first-time publicans, experienced licensees and growing operators.', 'check']
+  ];
+  return <><PageHero eyebrow="Why Star Pubs" title="A business partner behind your pub, not in front of it." copy="Running a pub takes energy, leadership and commercial focus. Star Pubs combines opportunity with training, practical support and access to a wider HEINEKEN UK network." backgroundImage={asset('StarPubs-Lifestyle-16.jpg')} />
+    <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8"><SectionHeading eyebrow="What candidates want to know" title="What support will I actually get?" copy="A recruitment site should make the proposition clear before a candidate invests time in an application." /><div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{support.map(([title, copy, icon]) => <div key={title} className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#eaf6fd] text-[#0a87c4]"><Icon name={icon} /></span><h3 className="mt-4 text-lg font-black text-[#1c1c31]">{title}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p></div>)}</div></section>
+    <section className="bg-[#eaf6fd]"><div className="mx-auto max-w-7xl px-5 py-14 lg:px-8"><SectionHeading eyebrow="Which candidate are you?" title="Start with your experience and ambition" /><div className="mt-8 grid gap-5 lg:grid-cols-3">{[['Your first pub', 'Focus on transferable skills, learning, financial readiness and the support you will need.'], ['Your next pub', 'Compare trading potential, agreement structure and the freedom you want over the offer.'], ['Growing a portfolio', 'Look for opportunities whose scale, complexity and investment fit your operating model.']].map(([title, copy]) => <div key={title} className="rounded-[1.5rem] bg-white p-6 shadow-sm"><h3 className="text-2xl font-black text-[#1c1c31]">{title}</h3><p className="mt-3 leading-7 text-slate-600">{copy}</p><Button variant="light" className="mt-5" onClick={() => navigate('portalHome')}>Browse opportunities</Button></div>)}</div></div></section>
+    <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8"><div className="rounded-[2rem] bg-[#1c1c31] p-8 text-white"><h2 className="text-3xl font-black">Ready to see whether there is a pub for you?</h2><p className="mt-3 max-w-2xl leading-7 text-white/70">Search the live-style vacancy experience, save pubs and build your applicant profile when you are ready.</p><div className="mt-6 flex flex-wrap gap-3"><Button onClick={() => navigate('portalHome')}>Find a pub</Button><Button variant="ghost" onClick={() => navigate('process')}>See how to apply</Button></div></div></section>
+  </>;
+}
+
+function ApplicationProcessPage({ navigate }) {
+  const lt = ['Find a pub', 'Telephone interview', 'Kick-off meeting with the BDM', 'Pre-entry training', 'Business plan', 'Business plan interview', 'Final commercial and legal steps', 'Start trading'];
+  const jat = ['Find a pub', 'Telephone interview', 'Assessment and conversation', 'Just Add Knowledge training', 'Business proposal', 'On-the-job training', 'Final agreement steps', 'Start trading'];
+  const Timeline = ({ items, tone }) => <ol className="mt-6 grid gap-3">{items.map((item, index) => <li key={item} className="flex gap-4 rounded-xl bg-slate-50 p-4"><span className={cx('flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black text-white', tone)}>{index + 1}</span><span className="pt-1 text-sm font-bold text-[#1c1c31]">{item}</span></li>)}</ol>;
+  return <><PageHero eyebrow="How to apply" title="A clear route from finding a pub to opening the doors." copy="The exact journey depends on the agreement and individual opportunity. The aim is to give you enough information, time and support to make an informed decision." backgroundImage={asset('StarPubs-Lifestyle-54.jpg')} />
+    <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
+      <div className="grid gap-6 lg:grid-cols-2"><article className="rounded-[2rem] border border-slate-200 bg-white p-6 md:p-8"><p className="text-xs font-black uppercase tracking-[0.16em] text-[#0a87c4]">Leased & Tenanted</p><h2 className="mt-2 text-3xl font-black text-[#1c1c31]">Typical journey</h2><p className="mt-3 leading-7 text-slate-600">The current Star Pubs guidance says the process often takes around 2–4 months, although every case is different.</p><Timeline items={lt} tone="bg-[#1c1c31]" /></article><article className="rounded-[2rem] border border-[#0a87c4]/30 bg-white p-6 md:p-8"><p className="text-xs font-black uppercase tracking-[0.16em] text-[#0a87c4]">Just Add Talent</p><h2 className="mt-2 text-3xl font-black text-[#1c1c31]">Typical journey</h2><p className="mt-3 leading-7 text-slate-600">The managed-operator route includes assessment, agreement-specific learning and practical training before you take on the pub.</p><Timeline items={jat} tone="bg-[#0a87c4]" /></article></div>
+      <div className="mt-8 rounded-[2rem] bg-[#eaf6fd] p-7"><h2 className="text-2xl font-black text-[#1c1c31]">What should I have ready?</h2><div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">{['Your work and hospitality experience', 'Your available unborrowed funds', 'Your preferred location and pub style', 'Time for training, planning and professional advice'].map((item) => <div key={item} className="flex gap-3 rounded-xl bg-white p-4 text-sm font-bold leading-6 text-[#1c1c31]"><Icon name="check" className="mt-0.5 shrink-0 text-[#0a87c4]" />{item}</div>)}</div></div>
+      <div className="mt-8 flex flex-wrap gap-3"><Button onClick={() => navigate('portalHome')}>Find a pub</Button><Button variant="light" onClick={() => navigate('faqs')}>Read application FAQs</Button></div>
+    </section>
+  </>;
+}
+
+function SupportEventsPage({ navigate }) {
+  return <><PageHero eyebrow="Support & events" title="Meet the team, learn the business and keep developing." copy="Recruitment does not stop at the application form. Candidates need to understand the training, events and support available before and after they take on a pub." backgroundImage={asset('StarPubs-Lifestyle-50.jpg')} />
+    <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8">
+      <SectionHeading eyebrow="Before you open" title="Training designed around the route you take" copy="Star Pubs provides agreement-specific learning and pre-entry support to help candidates prepare for the realities of running the pub." />
+      <div className="mt-8 grid gap-5 lg:grid-cols-2"><div className="rounded-[1.75rem] border border-slate-200 bg-white p-6"><h3 className="text-2xl font-black text-[#1c1c31]">Innside Knowledge</h3><p className="mt-3 leading-7 text-slate-600">Training for Leased & Tenanted candidates covering the practical and commercial areas needed to bring a business plan to life.</p></div><div className="rounded-[1.75rem] border border-slate-200 bg-white p-6"><h3 className="text-2xl font-black text-[#1c1c31]">Just Add Knowledge</h3><p className="mt-3 leading-7 text-slate-600">Agreement-specific learning for Just Add Talent candidates, supported by practical on-the-job development before taking on the pub.</p></div></div>
+      <SectionHeading eyebrow="Meet us before you apply" title="Recruitment events" copy="Events give candidates an informal way to understand the opportunities and speak to the team." />
+      <div className="mt-8 grid gap-5 md:grid-cols-3">{[['Open Days', 'For Leased & Tenanted opportunities.'], ['Discovery Days', 'For Just Add Talent opportunities.'], ['Showcase events', 'For investment-led opportunities.']].map(([title, copy]) => <div key={title} className="rounded-[1.5rem] bg-[#eaf6fd] p-6"><Icon name="message" className="text-[#0a87c4]" /><h3 className="mt-4 text-xl font-black text-[#1c1c31]">{title}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p></div>)}</div>
+      <div className="mt-10 grid gap-5 lg:grid-cols-3">{[['Ongoing coaching', 'Business Development Manager support and access to specialist teams.'], ['Digital learning', 'E-learning and development resources to keep building capability.'], ['Operational support', 'Practical guidance across areas such as beer quality, marketing, food and compliance.']].map(([title, copy]) => <div key={title} className="rounded-[1.5rem] border border-slate-200 bg-white p-6"><h3 className="font-black text-[#1c1c31]">{title}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p></div>)}</div>
+      <div className="mt-10 flex flex-wrap gap-3"><Button onClick={() => navigate('contact')}>Ask about upcoming events</Button><Button variant="light" onClick={() => navigate('portalHome')}>Browse vacancies</Button></div>
+    </section>
+  </>;
+}
+
+function ContactPage({ navigate }) {
+  return <><PageHero eyebrow="Contact the recruitment team" title="Questions before you apply?" copy="Speak to the Star Pubs recruitment team about running a pub, a current vacancy or the application process." backgroundImage={asset('StarPubs-Lifestyle-18.jpg')} />
+    <section className="mx-auto max-w-5xl px-5 py-14"><div className="grid gap-5 md:grid-cols-2"><div className="rounded-[2rem] bg-[#1c1c31] p-7 text-white"><p className="text-xs font-black uppercase tracking-[0.16em] text-[#47b9ea]">Pub recruitment</p><h2 className="mt-2 text-3xl font-black">Speak to the team</h2><div className="mt-6 grid gap-4"><div><p className="text-sm text-white/55">Telephone</p><p className="mt-1 text-xl font-black">08085 94 95 96</p></div><div><p className="text-sm text-white/55">Email</p><p className="mt-1 font-black">pubrecruitment@starpubs.co.uk</p></div><div><p className="text-sm text-white/55">Hours</p><p className="mt-1 font-black">Monday–Friday, 9am–5pm</p></div></div></div><div className="rounded-[2rem] border border-slate-200 bg-white p-7"><h2 className="text-2xl font-black text-[#1c1c31]">What can we help with?</h2><ul className="mt-5 grid gap-3">{['Choosing the right agreement', 'Questions about a specific pub', 'Understanding entry requirements', 'The application process and next steps', 'Recruitment events and meeting the team'].map((item) => <li key={item} className="flex gap-3 text-sm leading-6 text-slate-600"><Icon name="check" className="mt-0.5 shrink-0 text-[#0a87c4]" />{item}</li>)}</ul><Button className="mt-6 w-full" onClick={() => navigate('portalHome')}>Find a pub first</Button></div></div></section>
+  </>;
 }
 
 function PageHero({ eyebrow, title, copy, backgroundImage, children, navigate, backLabel = 'Back to vacancies' }) {
@@ -413,13 +639,18 @@ function filterVacancies(list, query, agreements, features, region, availableOnl
   });
 }
 
-function PortalHomePage({ navigate, profile, saved, toggleSave, initialAgreement }) {
-  const [query, setQuery] = useState('');
+function PortalHomePage({ navigate, profile, saved, toggleSave, initialAgreement, initialQuery = '' }) {
+  const [query, setQuery] = useState(initialQuery);
   const [agreements, setAgreements] = useState(initialAgreement ? [initialAgreement] : []);
   const [features, setFeatures] = useState([]);
   const [region, setRegion] = useState('All regions');
   const [availableOnly, setAvailableOnly] = useState(true);
   const [sort, setSort] = useState('Recommended');
+  const completedProfileFields = ['firstName', 'lastName', 'email', 'phone', 'postalCode', 'agreementInterest', 'preferredRegion'].filter((key) => String(profile[key] || '').trim()).length;
+  const profileCompletion = Math.round(completedProfileFields / 7 * 100);
+  const activeApplications = applications.filter((app) => !['Application accepted', 'Application rejected'].includes(app.stage)).length;
+  const recommended = vacancies.filter((pub) => pub.availability === 'Available').sort((a, b) => getRecommendationReasons(b, profile).length - getRecommendationReasons(a, profile).length).slice(0, 2);
+
   const filtered = useMemo(() => {
     const list = filterVacancies(vacancies, query, agreements, features, region, availableOnly);
     if (sort === 'A-Z') return [...list].sort((a, b) => a.pub.localeCompare(b.pub));
@@ -430,10 +661,30 @@ function PortalHomePage({ navigate, profile, saved, toggleSave, initialAgreement
   const toggleItem = (value, setter) => setter((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value]);
   const clearFilters = () => { setQuery(''); setAgreements([]); setFeatures([]); setRegion('All regions'); setAvailableOnly(true); };
 
-  return <><PageHero eyebrow="Applicant portal" title={'Welcome back, ' + profile.firstName + '. Find your next pub opportunity.'} copy="Use your profile, agreement preferences and pub features to narrow the vacancy list. Save opportunities and return to them when you are ready." backgroundImage={asset('StarPubs-Lifestyle-18.jpg')}><div className="rounded-[1.5rem] border border-white/15 bg-white/10 p-5 backdrop-blur"><p className="text-sm font-black text-white">Your search profile</p><div className="mt-4 grid gap-3 text-sm text-white/75"><p><span className="font-black text-white">Preferred agreement:</span> {profile.agreementInterest}</p><p><span className="font-black text-white">Preferred region:</span> {profile.preferredRegion}</p><p><span className="font-black text-white">Saved pubs:</span> {saved.length}</p></div><Button variant="ghost" className="mt-5 w-full" onClick={() => navigate('profile')}>Update profile</Button></div></PageHero>
-  <section id="vacancies" className="mx-auto max-w-7xl px-5 py-10 lg:px-8"><div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-xl md:p-6"><div className="grid gap-3 lg:grid-cols-[1fr_190px_160px]"><label className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 focus-within:border-[#0a87c4] focus-within:ring-4 focus-within:ring-[#0a87c4]/10"><Icon name="search" className="text-slate-400" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by pub, place or keyword" className="w-full bg-transparent text-sm outline-none" /></label><select value={region} onChange={(e) => setRegion(e.target.value)} className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold outline-none focus:border-[#0a87c4]">{regions.map((item) => <option key={item}>{item}</option>)}</select><Button variant="light" onClick={clearFilters}>Clear filters</Button></div><div className="mt-5 border-t border-slate-200 pt-5"><div className="flex flex-wrap items-center justify-between gap-3"><p className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-slate-500"><Icon name="filter" size={17} />Agreement type</p><label className="flex items-center gap-2 text-sm font-bold text-slate-600"><input type="checkbox" checked={availableOnly} onChange={(e) => setAvailableOnly(e.target.checked)} className="h-4 w-4 accent-[#0a87c4]" />Available now</label></div><div className="mt-3 flex flex-wrap gap-2">{agreementOptions.map((item) => <FilterChip key={item} label={item} selected={agreements.includes(item)} onClick={() => toggleItem(item, setAgreements)} />)}</div></div><div className="mt-5 border-t border-slate-200 pt-5"><p className="text-sm font-black uppercase tracking-[0.14em] text-slate-500">Pub features</p><div className="mt-3 flex gap-3 overflow-x-auto pb-2">{propertyFilters.map((item) => <FeatureChip key={item} label={item} selected={features.includes(item)} onClick={() => toggleItem(item, setFeatures)} />)}</div></div></div>
-  <div className="mt-9 flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><p className="text-sm font-black uppercase tracking-[0.18em] text-[#0a87c4]">{filtered.length + ' opportunities'}</p><h2 className="mt-2 text-3xl font-black text-[#1c1c31] md:text-4xl">Pub vacancies</h2></div><label className="flex items-center gap-2 text-sm font-bold text-slate-600">Sort by <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 font-black text-[#1c1c31]"><option>Recommended</option><option>A-Z</option><option>Region</option></select></label></div>
-  {filtered.length ? <div className="mt-6 grid gap-6 lg:grid-cols-2">{filtered.map((pub) => <VacancyCard key={pub.id} pub={pub} profile={profile} saved={saved.includes(pub.id)} toggleSave={toggleSave} navigate={navigate} />)}</div> : <EmptyState title="No pubs match those filters" copy="Try removing a feature, widening the region or viewing pubs that are not currently available." action="Reset filters" onAction={clearFilters} />}</section></>;
+  return <><PageHero eyebrow="Applicant portal" title={'Welcome back, ' + profile.firstName + '.'} copy="Keep your search moving, pick up applications and use your profile to get more relevant pub recommendations." backgroundImage={asset('StarPubs-Lifestyle-18.jpg')}>
+    <div className="rounded-[1.5rem] border border-white/15 bg-white/10 p-5 backdrop-blur"><p className="text-sm font-black text-white">Your next action</p><p className="mt-2 text-xl font-black">Continue The Rose Villa Tavern application</p><p className="mt-2 text-sm leading-6 text-white/65">Your business plan is the next incomplete step.</p><Button variant="ghost" className="mt-5 w-full" onClick={() => navigate('applicationJourney', 1)}>Continue application</Button></div>
+  </PageHero>
+
+  <section className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {[['Profile', profileCompletion + '% complete', 'profile', 'user'], ['Saved pubs', String(saved.length), 'saved', 'heart'], ['Active applications', String(activeApplications), 'applications', 'file'], ['Help & FAQs', 'Get support', 'faqs', 'message']].map(([label, value, target, icon]) => <button key={label} onClick={() => navigate(target)} className="rounded-[1.5rem] border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#0a87c4]/40 hover:shadow-lg"><div className="flex items-start justify-between"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eaf6fd] text-[#0a87c4]"><Icon name={icon} /></span><Icon name="arrow" size={17} className="text-slate-300" /></div><p className="mt-4 text-xs font-black uppercase tracking-[0.14em] text-slate-400">{label}</p><p className="mt-1 text-2xl font-black text-[#1c1c31]">{value}</p></button>)}
+    </div>
+
+    <div className="mt-10"><SectionHeading eyebrow="Recommended for you" title="Opportunities based on your profile" copy="Recommendations use your preferred agreement, region and availability. Keep your profile up to date to make them more useful." /></div>
+    <div className="mt-6 grid gap-6 lg:grid-cols-2">{recommended.map((pub) => <VacancyCard key={pub.id} pub={pub} profile={profile} saved={saved.includes(pub.id)} toggleSave={toggleSave} navigate={navigate} />)}</div>
+
+    <div id="vacancies" className="mt-14 rounded-[2rem] border border-slate-200 bg-white p-5 shadow-xl md:p-6">
+      <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-[#0a87c4]">Find a pub</p><h2 className="mt-1 text-3xl font-black text-[#1c1c31]">Search all opportunities</h2></div><p className="max-w-xl text-sm leading-6 text-slate-500">Search broadly first, then narrow by agreement, region and the features that matter to you.</p></div>
+      <div className="mt-6 grid gap-3 lg:grid-cols-[1fr_190px_160px]"><label className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 focus-within:border-[#0a87c4] focus-within:ring-4 focus-within:ring-[#0a87c4]/10"><Icon name="search" className="text-slate-400" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by pub, place or keyword" className="w-full bg-transparent text-sm outline-none" /></label><select value={region} onChange={(e) => setRegion(e.target.value)} className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold outline-none focus:border-[#0a87c4]">{regions.map((item) => <option key={item}>{item}</option>)}</select><Button variant="light" onClick={clearFilters}>Clear filters</Button></div>
+      <div className="mt-5 border-t border-slate-200 pt-5"><div className="flex flex-wrap items-center justify-between gap-3"><p className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-slate-500"><Icon name="filter" size={17} />Agreement type</p><label className="flex items-center gap-2 text-sm font-bold text-slate-600"><input type="checkbox" checked={availableOnly} onChange={(e) => setAvailableOnly(e.target.checked)} className="h-4 w-4 accent-[#0a87c4]" />Available now</label></div><div className="mt-3 flex flex-wrap gap-2">{agreementOptions.map((item) => <FilterChip key={item} label={item} selected={agreements.includes(item)} onClick={() => toggleItem(item, setAgreements)} />)}</div></div>
+      <div className="mt-5 border-t border-slate-200 pt-5"><p className="text-sm font-black uppercase tracking-[0.14em] text-slate-500">Pub features</p><div className="mt-3 flex gap-3 overflow-x-auto pb-2">{propertyFilters.map((item) => <FeatureChip key={item} label={item} selected={features.includes(item)} onClick={() => toggleItem(item, setFeatures)} />)}</div></div>
+    </div>
+
+    <div className="mt-9 flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><p className="text-sm font-black uppercase tracking-[0.18em] text-[#0a87c4]">{filtered.length + ' opportunities'}</p><h2 className="mt-2 text-3xl font-black text-[#1c1c31] md:text-4xl">Pub vacancies</h2></div><label className="flex items-center gap-2 text-sm font-bold text-slate-600">Sort by <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 font-black text-[#1c1c31]"><option>Recommended</option><option>A-Z</option><option>Region</option></select></label></div>
+    {filtered.length ? <div className="mt-6 grid gap-6 lg:grid-cols-2">{filtered.map((pub) => <VacancyCard key={pub.id} pub={pub} profile={profile} saved={saved.includes(pub.id)} toggleSave={toggleSave} navigate={navigate} />)}</div> : <EmptyState title="No pubs match those filters" copy="Try removing a feature, widening the region or viewing pubs that are not currently available." action="Reset filters" onAction={clearFilters} />}
+
+    <div className="mt-12 rounded-[2rem] bg-[#eaf6fd] p-7"><div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center"><div><p className="text-xs font-black uppercase tracking-[0.16em] text-[#0a87c4]">Vacancy alerts</p><h3 className="mt-2 text-2xl font-black text-[#1c1c31]">Nothing right today? Save your search.</h3><p className="mt-2 text-sm leading-6 text-slate-600">Choose regions, agreements and features and get alerted when a relevant pub becomes available.</p></div><Button variant="navy" onClick={() => navigate('profile')}>Manage alert preferences</Button></div></div>
+  </section></>;
 }
 
 function FilterChip({ label, selected, onClick }) {
@@ -466,7 +717,17 @@ function EmptyState({ title, copy, action, onAction }) {
 function PubDetailPage({ pub, navigate, saved, toggleSave, onApply }) {
   if (!pub) return null;
   const letAgreed = pub.availability === 'Let agreed';
-  return <><PageHero eyebrow="Pub opportunity" title={pub.pub} copy={pub.summary} backgroundImage={pub.image} navigate={navigate}><div className="rounded-[1.5rem] border border-white/15 bg-white/10 p-5 backdrop-blur"><p className="text-sm text-white/60">Agreement</p><p className="mt-1 text-xl font-black">{pub.agreement}</p><p className="mt-4 text-sm text-white/60">Status</p><p className="mt-1 font-black">{pub.availability}</p></div></PageHero><section className="mx-auto grid max-w-7xl gap-7 px-5 py-12 lg:grid-cols-[1fr_360px] lg:px-8"><div><div className="grid gap-5 md:grid-cols-2">{pub.features.map((feature) => <div key={feature} className="rounded-2xl border border-slate-200 bg-white p-5"><Icon name="check" className="text-[#0a87c4]" /><p className="mt-3 font-black text-[#1c1c31]">{feature}</p></div>)}</div><div className="mt-7 rounded-[1.75rem] border border-slate-200 bg-white p-6 md:p-8"><h2 className="text-3xl font-black text-[#1c1c31]">The opportunity</h2><p className="mt-4 leading-8 text-slate-600">{pub.area}</p><h3 className="mt-7 text-xl font-black text-[#1c1c31]">Who could this suit?</h3><p className="mt-3 leading-8 text-slate-600">{pub.idealFor}</p></div></div><aside className="lg:sticky lg:top-28 lg:self-start"><div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-lg"><p className="text-xs font-black uppercase tracking-[0.16em] text-[#0a87c4]">Key details</p><div className="mt-5 grid gap-4"><InfoPill title="Entry" copy={pub.costs} /><InfoPill title="Earnings model" copy={pub.earnings} /><InfoPill title="Investment" copy={pub.investment} /></div><Button disabled={letAgreed} className="mt-6 w-full py-4 text-base" onClick={() => onApply(pub.id)}>{letAgreed ? 'Let agreed' : 'Start application'}</Button><Button variant="light" className="mt-3 w-full" onClick={() => toggleSave(pub.id)}>{saved ? 'Remove from saved' : 'Save pub'}</Button></div></aside></section></>;
+  return <><PageHero eyebrow="Pub opportunity" title={pub.pub} copy={pub.summary} backgroundImage={pub.image} navigate={navigate}>
+    <div className="rounded-[1.5rem] border border-white/15 bg-white/10 p-5 backdrop-blur"><p className="text-sm text-white/60">Agreement</p><p className="mt-1 text-xl font-black">{pub.agreement}</p><p className="mt-4 text-sm text-white/60">Status</p><p className="mt-1 font-black">{pub.availability}</p></div>
+  </PageHero>
+  <section className="mx-auto grid max-w-7xl gap-7 px-5 py-12 lg:grid-cols-[1fr_360px] lg:px-8">
+    <div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{pub.features.map((feature) => <div key={feature} className="rounded-2xl border border-slate-200 bg-white p-5"><Icon name="check" className="text-[#0a87c4]" /><p className="mt-3 text-sm font-black text-[#1c1c31]">{feature}</p></div>)}</div>
+      <div className="mt-7 rounded-[1.75rem] border border-slate-200 bg-white p-6 md:p-8"><h2 className="text-3xl font-black text-[#1c1c31]">The opportunity</h2><p className="mt-4 leading-8 text-slate-600">{pub.area}</p><h3 className="mt-7 text-xl font-black text-[#1c1c31]">Who could this suit?</h3><p className="mt-3 leading-8 text-slate-600">{pub.idealFor}</p></div>
+      <div className="mt-7 rounded-[1.75rem] bg-[#eaf6fd] p-6 md:p-8"><p className="text-xs font-black uppercase tracking-[0.16em] text-[#0a87c4]">Before you apply</p><h2 className="mt-2 text-2xl font-black text-[#1c1c31]">Know what happens next</h2><div className="mt-5 grid gap-3 md:grid-cols-3">{[['1', 'Start application', 'Sign in or create your applicant profile.'], ['2', 'Talk to the team', 'We get to know your experience, plans and questions.'], ['3', 'Progress the pub', 'Move through the agreement-specific assessment and preparation.']].map(([n, title, copy]) => <div key={n} className="rounded-xl bg-white p-4"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0a87c4] text-xs font-black text-white">{n}</span><p className="mt-3 font-black text-[#1c1c31]">{title}</p><p className="mt-1 text-sm leading-6 text-slate-600">{copy}</p></div>)}</div><button onClick={() => navigate('process')} className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#0a87c4]">See the full application process <Icon name="arrow" size={16} /></button></div>
+    </div>
+    <aside className="lg:sticky lg:top-28 lg:self-start"><div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-lg"><p className="text-xs font-black uppercase tracking-[0.16em] text-[#0a87c4]">At a glance</p><div className="mt-5 grid gap-4"><InfoPill title="Entry" copy={pub.costs} /><InfoPill title="Earnings model" copy={pub.earnings} /><InfoPill title="Investment" copy={pub.investment} /></div><Button disabled={letAgreed} className="mt-6 w-full py-4 text-base" onClick={() => onApply(pub.id)}>{letAgreed ? 'Let agreed' : 'Start application'}</Button><Button variant="light" className="mt-3 w-full" onClick={() => toggleSave(pub.id)}>{saved ? 'Remove from saved' : 'Save pub'}</Button><div className="mt-5 border-t border-slate-200 pt-5"><p className="text-sm font-black text-[#1c1c31]">Questions first?</p><p className="mt-1 text-sm leading-6 text-slate-500">Speak to the recruitment team before you apply.</p><button onClick={() => navigate('contact')} className="mt-3 text-sm font-black text-[#0a87c4]">Contact us →</button></div></div></aside>
+  </section></>;
 }
 
 function SignInPage({ navigate, onSignedIn }) {
@@ -539,7 +800,15 @@ function FloatingChatBubble({ navigate }) {
 }
 
 function Footer({ navigate, portal = false }) {
-  return <footer className="mt-16 bg-[#1c1c31] text-white"><div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 md:grid-cols-[1fr_auto] lg:px-8"><div><button onClick={() => navigate('siteHome')}><StarLogo /></button><p className="mt-4 max-w-xl text-sm leading-7 text-white/60">Leadership prototype showing how the public Star Pubs recruitment journey and applicant portal could work as one connected experience.</p></div><div className="flex flex-wrap gap-5 text-sm font-bold text-white/70"><button onClick={() => navigate('portalHome')} className="hover:text-white">Find a pub</button><button onClick={() => navigate('faqs')} className="hover:text-white">FAQs</button><button onClick={() => navigate('agreements')} className="hover:text-white">Agreements</button><a href={base + 'vacancy-listing-concepts.html'} className="hover:text-white">Leadership card concepts</a>{portal && <button onClick={() => navigate('siteHome')} className="hover:text-white">Star Pubs home</button>}</div></div></footer>;
+  return <footer className="mt-16 bg-[#1c1c31] text-white">
+    <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 md:grid-cols-2 lg:grid-cols-[1.2fr_0.8fr_0.8fr_0.9fr] lg:px-8">
+      <div><button onClick={() => navigate('siteHome')}><StarLogo /></button><p className="mt-4 max-w-sm text-sm leading-7 text-white/60">Leadership prototype showing a connected Star Pubs recruitment journey from first visit to application progress.</p><div className="mt-5 text-sm font-bold text-white/75"><p>08085 94 95 96</p><p className="mt-1">pubrecruitment@starpubs.co.uk</p></div></div>
+      <div><p className="text-sm font-black">Explore</p><div className="mt-4 grid gap-3 text-sm text-white/65"><button className="text-left hover:text-white" onClick={() => navigate('portalHome')}>Find a pub</button><button className="text-left hover:text-white" onClick={() => navigate('whyStar')}>Why Star</button><button className="text-left hover:text-white" onClick={() => navigate('agreements')}>Agreements</button><button className="text-left hover:text-white" onClick={() => navigate('process')}>How to apply</button></div></div>
+      <div><p className="text-sm font-black">Help</p><div className="mt-4 grid gap-3 text-sm text-white/65"><button className="text-left hover:text-white" onClick={() => navigate('support')}>Support & events</button><button className="text-left hover:text-white" onClick={() => navigate('faqs')}>FAQs</button><button className="text-left hover:text-white" onClick={() => navigate('contact')}>Contact recruitment</button><a href={base + 'vacancy-listing-concepts.html'} className="hover:text-white">Leadership card concepts</a></div></div>
+      <div><p className="text-sm font-black">Applicant account</p><div className="mt-4 grid gap-3 text-sm text-white/65"><button className="text-left hover:text-white" onClick={() => navigate('signin')}>Sign in</button><button className="text-left hover:text-white" onClick={() => navigate('saved')}>Saved pubs</button><button className="text-left hover:text-white" onClick={() => navigate('applications')}>Applications</button><button className="text-left hover:text-white" onClick={() => navigate('profile')}>Profile & alerts</button></div></div>
+    </div>
+    <div className="border-t border-white/10"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-3 px-5 py-5 text-xs text-white/40 md:flex-row lg:px-8"><span>Star Pubs recruitment leadership prototype</span><span>Sitecore 10.3 compatible frontend build</span></div></div>
+  </footer>;
 }
 
 export default function App() {
@@ -572,15 +841,19 @@ export default function App() {
     else navigate('portalHome');
   };
 
-  const publicPages = ['siteHome', 'agreements', 'faqs'];
+  const publicPages = ['siteHome', 'whyStar', 'agreements', 'process', 'support', 'faqs', 'contact'];
   const portalPages = ['portalHome', 'profile', 'saved', 'applications', 'pubDetail', 'applicationJourney', 'similar'];
   const isPublic = publicPages.includes(page);
   const isPortal = portalPages.includes(page);
 
   let content;
   if (page === 'siteHome') content = <PublicHomePage navigate={navigate} signedIn={signedIn} />;
+  else if (page === 'whyStar') content = <WhyStarPage navigate={navigate} />;
   else if (page === 'agreements') content = <AgreementsPage navigate={navigate} />;
+  else if (page === 'process') content = <ApplicationProcessPage navigate={navigate} />;
+  else if (page === 'support') content = <SupportEventsPage navigate={navigate} />;
   else if (page === 'faqs') content = <FAQPage navigate={navigate} />;
+  else if (page === 'contact') content = <ContactPage navigate={navigate} />;
   else if (page === 'signin') content = <SignInPage navigate={navigate} onSignedIn={finishSignIn} />;
   else if (page === 'profile') content = <ProfilePage profile={profile} setProfile={setProfile} navigate={navigate} />;
   else if (page === 'saved') content = <SavedPage savedPubs={savedPubs} toggleSave={toggleSave} navigate={navigate} profile={profile} />;
@@ -588,7 +861,13 @@ export default function App() {
   else if (page === 'pubDetail') content = <PubDetailPage pub={currentPub} navigate={navigate} saved={currentPub ? saved.includes(currentPub.id) : false} toggleSave={toggleSave} onApply={beginApplication} />;
   else if (page === 'applicationJourney') content = <ApplicationJourneyPage pub={currentPub} navigate={navigate} />;
   else if (page === 'similar') content = <SimilarPage sourcePub={currentPub} navigate={navigate} saved={saved} toggleSave={toggleSave} profile={profile} />;
-  else content = <PortalHomePage navigate={navigate} profile={profile} saved={saved} toggleSave={toggleSave} initialAgreement={routeOptions.agreement} />;
+  else content = <PortalHomePage navigate={navigate} profile={profile} saved={saved} toggleSave={toggleSave} initialAgreement={routeOptions.agreement} initialQuery={routeOptions.query || ''} />;
 
-  return <main className="min-h-screen bg-[#f7f9fb] text-slate-900">{isPublic && <PublicHeader page={page} navigate={navigate} signedIn={signedIn} profile={profile} onLogout={logout} />}{isPortal && <PortalHeader page={page} navigate={navigate} signedIn={signedIn} profile={profile} onLogout={logout} />}{content}<Footer navigate={navigate} portal={isPortal} /><FloatingChatBubble navigate={navigate} /></main>;
+  return <main className="min-h-screen bg-[#f7f9fb] text-slate-900">
+    {isPublic && <PublicHeader page={page} navigate={navigate} signedIn={signedIn} profile={profile} onLogout={logout} />}
+    {isPortal && <PortalHeader page={page} navigate={navigate} signedIn={signedIn} profile={profile} onLogout={logout} />}
+    {content}
+    <Footer navigate={navigate} portal={isPortal} />
+    <FloatingChatBubble navigate={navigate} />
+  </main>;
 }

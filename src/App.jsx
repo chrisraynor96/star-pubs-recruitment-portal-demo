@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-const base = import.meta.env.BASE_URL || '/';
-const asset = (path) => base + 'images/' + path;
+const runtimeConfig = typeof window !== 'undefined' ? (window.__STAR_PUBS_CONFIG__ || {}) : {};
+const base = runtimeConfig.assetBase || import.meta.env.BASE_URL || '/';
+const asset = (path) => base.replace(/\/$/, '') + '/images/' + path;
 
 const STAR_NAVY = '#1c1c31';
 const STAR_BLUE = '#0a87c4';
@@ -542,10 +543,10 @@ function Footer({ navigate, portal = false }) {
 }
 
 export default function App() {
-  const [page, setPage] = useState('siteHome');
+  const [page, setPage] = useState(runtimeConfig.initialPage || 'siteHome');
   const [param, setParam] = useState(null);
   const [routeOptions, setRouteOptions] = useState({});
-  const [signedIn, setSignedIn] = useState(false);
+  const [signedIn, setSignedIn] = useState(Boolean(runtimeConfig.signedIn));
   const [pendingRoute, setPendingRoute] = useState(null);
   const [profile, setProfile] = useState(initialProfile);
   const [saved, setSaved] = useState([1, 3]);

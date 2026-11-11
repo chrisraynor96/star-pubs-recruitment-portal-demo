@@ -1,0 +1,45 @@
+name: Build Sitecore 10.3 bundle
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'vite.config.js'
+      - 'sitecore/**'
+      - '.github/workflows/sitecore-build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-sitecore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Sitecore bundle
+        run: npm run build:sitecore
+
+      - name: Upload Sitecore bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: star-pubs-sitecore-10.3-bundle
+          path: |
+            dist-sitecore/**
+            sitecore/Views/StarPubsRecruitment/RecruitmentApp.cshtml
+            SITECORE-10.3-INTEGRATION.md
+          if-no-files-found: error
